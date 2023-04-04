@@ -1,5 +1,4 @@
-﻿// Copyrighting Polina Busko 2022
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -21,18 +20,7 @@ namespace SPPR
 
         double function(double a, double b, double c, double d, double x)
         {
-            //double f = a * Math.Sin(b * x) + c * Math.Cos(d * x);
-            //double f = x * x;
-            //double f = x;
-            double f=0;
-            if (x <= 2)
-            {
-                f = 1;
-            }
-            else if ((2<x) && (x<=4))
-            {
-                f = x - 1;
-            }
+            double f = a * Math.Sin(b * x) + c * Math.Cos(d * x);
             return f;
         }
         (double a , int b) maxChar(List<double> mas)
@@ -51,8 +39,12 @@ namespace SPPR
         }
         private void button1_Click(object sender, EventArgs e)
         {
+            double Rcheck=0;
+            int Tnum=0;
             listBox1.Items.Clear();
             listBox2.Items.Clear();
+            listBox3.Items.Clear();
+
             chart1.Series["Series1"].Points.Clear();
             chart1.Series["Series2"].Points.Clear();
             chart1.Series["Series3"].Points.Clear();
@@ -97,13 +89,27 @@ namespace SPPR
                 }
                 int k = 2;
                 int t = 0;
-                while (Math.Abs(xValue[t+1]-xValue[t])>eps&& k<maxIter)
+                while ( k < maxIter)
                 {
-                    for (int i = 0; i < k - 1; i++)
-                    {
+                    R.Clear();// Вот сюда воткнул 
+                    Rcheck = 0;
+                    listBox1.Items.Add(("___________Итерация_______", k));
+                    for (int i = 0; i < k - 1; i++) { 
                         R.Add(xValue[i + 1] - xValue[i]);
-                        listBox2.Items.Add(("xfirst=", xValue[i], " ", "xlast=", xValue[i + 1], "R", xValue[i + 1] - xValue[i]));
+                        if ((xValue[i + 1] - xValue[i]) >= Rcheck)
+                        {
+                            Rcheck = xValue[i + 1] - xValue[i];
+                            Tnum = i;
+                        }
+                        listBox1.Items.Add(("xfirst=", xValue[i], " ", "xlast=", xValue[i + 1], "R", xValue[i + 1] - xValue[i]));
                     }
+                    listBox3.Items.Add(("Rmax = ", Rcheck, "  ", "T=", Tnum, "  ", "X[t+1]=", xValue[Tnum + 1], "X[t]=", xValue[Tnum], "  ", "  ", "X[t+1] - X[t] = ", xValue[Tnum + 1] - xValue[Tnum]));
+                   
+                    if ((xValue[Tnum + 1] - xValue[Tnum]) <= eps) {
+                        MessageBox.Show("ВЫХОД ПО ТОЧНОСТИ");
+                        break; 
+                    }
+
                     (double a, int b) Char = maxChar(R);
                     t = Char.b;
                     R.Clear();
@@ -121,7 +127,7 @@ namespace SPPR
                     for (int i = 0; i < xValue.Count(); i++)
                         Zfunc[i] = function(A, B, C, D, xValue[i]);
                     k++;
-                    listBox1.Items.Add(("x=",nextX,"  ","z=",currentZ));
+                    listBox2.Items.Add(("x=", nextX, "  ", "z=", currentZ));
                 }
                 chart1.Series["Series3"].Points.AddXY(thisX, min);
                 label15.Text = Convert.ToString(min);
@@ -148,8 +154,11 @@ namespace SPPR
                 List<double> R = new List<double>();
                 int k = 2;
                 int t = 0;
-                while (Math.Abs(xValue[t + 1] - xValue[t]) > eps && k < maxIter)
+                while (k < maxIter)
                 {
+                    R.Clear();// Вот сюда воткнул 
+                    Rcheck = 0;
+                    listBox1.Items.Add(("___________Итерация_______",k));
                     for (int i=0;i<k-1;i++)
                     {
                         double tmpM = Math.Abs((Zfunc[i + 1] - Zfunc[i]) / (xValue[i + 1] - xValue[i]));
@@ -160,9 +169,22 @@ namespace SPPR
                     for (int i = 0; i < k - 1; i++)
                     {
                         R.Add(m * (xValue[i + 1] - xValue[i]) + (Zfunc[i + 1] - Zfunc[i]) * (Zfunc[i + 1] - Zfunc[i]) / (m * (xValue[i + 1] - xValue[i])) - 2 * (Zfunc[i + 1] + Zfunc[i]));
-                        listBox2.Items.Add(("xfirst=", xValue[i], " ", "xlast=", xValue[i + 1],"R=", m * (xValue[i + 1] - xValue[i]) + (Zfunc[i + 1] - Zfunc[i]) * (Zfunc[i + 1] - Zfunc[i]) / (m * (xValue[i + 1] - xValue[i])) - 2 * (Zfunc[i + 1] + Zfunc[i])));
+                        listBox1.Items.Add(("xfirst=", xValue[i], " ", "xlast=", xValue[i + 1], "R=", m * (xValue[i + 1] - xValue[i]) + (Zfunc[i + 1] - Zfunc[i]) * (Zfunc[i + 1] - Zfunc[i]) / (m * (xValue[i + 1] - xValue[i])) - 2 * (Zfunc[i + 1] + Zfunc[i])));
+                        if ((m * (xValue[i + 1] - xValue[i]) + (Zfunc[i + 1] - Zfunc[i]) * (Zfunc[i + 1] - Zfunc[i]) / (m * (xValue[i + 1] - xValue[i])) - 2 * (Zfunc[i + 1] + Zfunc[i])) >= Rcheck)
+                        {
+                            Rcheck = m * (xValue[i + 1] - xValue[i]) + (Zfunc[i + 1] - Zfunc[i]) * (Zfunc[i + 1] - Zfunc[i]) / (m * (xValue[i + 1] - xValue[i])) - 2 * (Zfunc[i + 1] + Zfunc[i]);
+                            Tnum = i;
+                        }
+                    
                     }
-                    (double a, int b) Char = maxChar(R);           
+                    listBox3.Items.Add(("Rmax = " , Rcheck, "  ","T=",Tnum,"  ","X[t+1]=",xValue[Tnum+1], "X[t]=", xValue[Tnum], "  ", "  ","X[t+1] - X[t] = ", xValue[Tnum + 1] - xValue[Tnum]));
+                    if ((xValue[Tnum+1] - xValue[Tnum]) <= eps)
+                    {
+                        MessageBox.Show("ВЫХОД ПО ТОЧНОСТИ");
+                        break;
+                    }
+
+                    (double a, int b) Char = maxChar(R);
                     t = Char.b;
                     R.Clear();
                     double nextX = (xValue[t + 1] + xValue[t]) / 2 - (Zfunc[t + 1] - Zfunc[t]) / (2 * m);
@@ -174,9 +196,8 @@ namespace SPPR
                     for (int i = 0; i < xValue.Count(); i++)
                         Zfunc[i] = function(A, B, C, D, xValue[i]);
 
-                    listBox1.Items.Add(("x=", nextX, "  ", "z=", currentZ));
+                    listBox2.Items.Add(("x=", nextX, "  ", "z=", currentZ));
                     k++;
-
                 }
                 chart1.Series["Series3"].Points.AddXY(xValue[t], Zfunc[t]);
                 label15.Text = Convert.ToString(Zfunc[t]);
@@ -203,24 +224,40 @@ namespace SPPR
                 List<double> R = new List<double>();
                 int k = 2;
                 int t = 0;
-                while(Math.Abs(xValue[t+1] - xValue[t]) > eps && k < maxIter)
+                while(k < maxIter)
                 {
+                    R.Clear();// Вот сюда воткнул 
+                    Rcheck = 0;
+                    listBox1.Items.Add(("___________Итерация_______", k));
                     for (int i = 0; i < k - 1; i++)
                     {
                         double tmpM = Math.Abs((Zfunc[i + 1] - Zfunc[i]) / (xValue[i + 1] - xValue[i]));
                         if (M < tmpM) M = tmpM;
                     }
-                    if (M == 0) m = r;
-                    else m = r ;
+                    if (M == 0) m = 1;
+                    else m = r * M;
                     for (int i = 0; i < k - 1; i++)
                     {
                         R.Add(m * (xValue[i + 1] - xValue[i]) / 2.0 - (Zfunc[i + 1] + Zfunc[i]) / 2.0);
-                        listBox2.Items.Add(("xfirst=", xValue[i], " ", "xlast=", xValue[i + 1], "R=", m * (xValue[i + 1] - xValue[i]) / 2.0 - (Zfunc[i + 1] + Zfunc[i]) / 2.0));
+                        listBox1.Items.Add(("xfirst=", xValue[i], " ", "xlast=", xValue[i + 1], "R=", m * (xValue[i + 1] - xValue[i]) / 2.0 - (Zfunc[i + 1] + Zfunc[i]) / 2.0));
+                        if ((m * (xValue[i + 1] - xValue[i]) / 2.0 - (Zfunc[i + 1] + Zfunc[i]) / 2.0) >= Rcheck)
+                        {
+                            Rcheck = (m * (xValue[i + 1] - xValue[i]) / 2.0 - (Zfunc[i + 1] + Zfunc[i]) / 2.0);
+                            Tnum = i;
+                        }
+
                     }
+                    listBox3.Items.Add(("Rmax = ", Rcheck, "  ", "T=", Tnum, "  ", "X[t+1]=", xValue[Tnum + 1], "X[t]=", xValue[Tnum], "  ", "  ", "X[t+1] - X[t] = ", xValue[Tnum + 1] - xValue[Tnum]));
+                    if ((xValue[Tnum + 1] - xValue[Tnum]) <= eps)
+                    {
+                        MessageBox.Show("ВЫХОД ПО ТОЧНОСТИ");
+                        break;
+                    }
+
                     (double a, int b) Char = maxChar(R);
                     t = Char.b;
                     R.Clear();
-                    double nextX = (xValue[t + 1] + xValue[t]) / 2.0 - (Zfunc[t + 1] - Zfunc[t]) / (2.0 * m);
+                    double nextX = (xValue[t + 1] + xValue[t]) / 2 - (Zfunc[t + 1] - Zfunc[t]) / (2 * m);
                     chart1.Series["Series2"].Points.AddXY(nextX, -6);
                     double currentZ = function(A, B, C, D, nextX);
                     xValue.Add(nextX);
@@ -228,14 +265,19 @@ namespace SPPR
                     xValue.Sort();
                     for (int i = 0; i < xValue.Count(); i++)
                         Zfunc[i] = function(A, B, C, D, xValue[i]);
-                    listBox1.Items.Add(("x=", nextX, "  ", "z=", currentZ));
                     k++;
+                    listBox2.Items.Add(("x=", nextX, "  ", "z=", currentZ));
                 }
                 chart1.Series["Series3"].Points.AddXY(xValue[t], Zfunc[t]);
                 label15.Text = Convert.ToString(Zfunc[t]);
                 label16.Text = Convert.ToString(xValue[t]);
                 label17.Text = Convert.ToString(k);
             }
+
+        }
+
+        private void chart1_Click(object sender, EventArgs e)
+        {
 
         }
     }
